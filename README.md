@@ -9,7 +9,9 @@ i generuje raporty. Aplikacja niczego nie uruchamia, nie zatrzymuje i nie zmieni
 - **Roboty**: statusy robotów z sesji, sortowanie i wyszukiwanie.
 - **Działające**: joby w toku (z oznaczeniem długiego działania), oczekujące (Pending) i zakończone błędem (Faulted).
 - **Kolejki**: dzisiejsze sukcesy, AE i BE, procent sukcesu, zmiana względem wczoraj; podgląd elementów z błędami
-  i eksport do CSV.
+  i eksport do CSV. W szczegółach można „zamknąć” obsłużone elementy AE/BE (ukryć je na liście), pokazać je
+  ponownie („Pokaż zamknięte”) lub przywrócić. Zamknięcie jest tylko lokalne (plik `dismissed.json` obok ustawień,
+  wpisy starsze niż 60 dni są usuwane) i nie zmienia liczników AE/BE ani powiadomień.
 - **Powiadomienia** na pulpit: robot przestał odpowiadać, nowe AE/BE w kolejce, job Faulted. Można je wyciszyć
   na 30 min, 1 h, 4 h lub do końca dnia (zasobnik > „Wycisz powiadomienia”). Wyciszenie działa tylko w bieżącej
   sesji aplikacji.

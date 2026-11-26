@@ -16,6 +16,7 @@ from orch_monitor.api.auth import AuthError, TokenProvider
 from orch_monitor.api.client import OrchestratorClient
 from orch_monitor.api.folders import Folder, list_folders, resolve_folders
 from orch_monitor.clock import Clock, utc_now
+from orch_monitor.config.dismissed import DismissedStore
 from orch_monitor.config.secret import get_secret
 from orch_monitor.config.settings import Settings, SettingsError, load_settings
 from orch_monitor.logging_setup import (
@@ -176,7 +177,8 @@ class App:
         self.clock = clock
         self.settings = settings
         self.backend = Backend(settings, clock)
-        self.window = MainWindow(clock, details_provider=self.backend.details)
+        self.dismissed = DismissedStore(clock=clock)
+        self.window = MainWindow(clock, details_provider=self.backend.details, store=self.dismissed)
         self.bridge = SnapshotBridge()
         self.bridge.snapshot_ready.connect(self.window.apply_snapshot)
         self.scheduler = RefreshScheduler(self.backend.fetch, settings.refresh_interval_s, clock)

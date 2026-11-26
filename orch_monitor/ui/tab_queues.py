@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from orch_monitor.config.dismissed import DismissedStore
 from orch_monitor.refresh.snapshot import Snapshot
 from orch_monitor.reports.csv_queues import (
     default_filename,
@@ -58,13 +59,18 @@ def _counter_item(label: str, value: int) -> QTableWidgetItem:
 
 
 class QueuesTab(QWidget):
+    """Liczniki AE/BE pochodza z Orchestratora; lokalne „zamkniecie” bledu (store) dotyczy
+    tylko listy w oknie szczegolow i nie zmienia licznikow ani powiadomien."""
+
     def __init__(
         self,
         details_provider: DetailsProvider | None = None,
         parent: QWidget | None = None,
         synchronous_details: bool = False,
+        store: DismissedStore | None = None,
     ) -> None:
         super().__init__(parent)
+        self._store = store
         self._provider = details_provider
         self._sync = synchronous_details
         self._rows: list[QueueRow] = []
@@ -118,7 +124,11 @@ class QueuesTab(QWidget):
         if self._provider is None or not 0 <= row < len(self._rows):
             return None
         dlg = QueueDetailsDialog(
-            self._rows[row], self._provider, parent=self, synchronous=self._sync
+            self._rows[row],
+            self._provider,
+            parent=self,
+            synchronous=self._sync,
+            store=self._store,
         )
         dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.finished.connect(

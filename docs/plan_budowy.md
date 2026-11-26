@@ -402,6 +402,23 @@ Testy UI uruchamiane przez pytest-qt z `QT_QPA_PLATFORM=offscreen`, więc dział
 
 Testy TC-22.4–22.6 wymagają prawdziwego tenanta i nie uruchamiają się w zwykłym pipeline; oznaczone markerem `@pytest.mark.live` albo jako lista ręczna.
 
+### 23. Zamykanie błędów w szczegółach kolejki
+
+- **Cel:** developer może „zamknąć” obsłużony element AE/BE, żeby nie pokazywał się już na liście szczegółów.
+- **Zakres:** `config/dismissed.py` (`DismissedStore`, plik `dismissed.json` obok ustawień, zapis atomowy, czyszczenie wpisów starszych niż 60 dni); okno szczegółów kolejki: wybór wierszy, „Zamknij zaznaczone”, „Pokaż zamknięte”, „Przywróć zaznaczone”, lista z cache ostatniego wyniku (bez ponownego zapytania do API); wpięcie `App` → `MainWindow` → `QueuesTab` → okno szczegółów.
+- **Kryteria akceptacji:** zamknięty element jest domyślnie ukryty, także po ponownym otwarciu okna; liczniki AE/BE w zakładce Kolejki i powiadomienia nie zmieniają się (to statystyka z Orchestratora); uszkodzony plik nie powoduje błędu; w Orchestratorze nic się nie zmienia.
+
+| ID | Scenariusz | Oczekiwany wynik |
+|---|---|---|
+| TC-23.1 | Zamknięcie elementów i ponowne wczytanie magazynu | Elementy nadal zamknięte, plik w formacie `{"version": 1, "items": {...}}` |
+| TC-23.2 | Brakujący lub uszkodzony plik | Pusty zbiór, bez wyjątku |
+| TC-23.3 | Wpisy starsze niż 60 dni | Usuwane przy ładowaniu |
+| TC-23.4 | Przywrócenie elementu | Element znów niezamknięty, także po ponownym wczytaniu |
+| TC-23.5 | „Zamknij zaznaczone” na jednym wierszu | Wiersz znika, API nie jest wołane ponownie, etykieta „zamkniętych ukrytych: 1” |
+| TC-23.6 | „Pokaż zamknięte” | Zamknięty element widoczny, szary, z dopiskiem „(zamknięty)” |
+| TC-23.7 | „Przywróć zaznaczone” przy włączonym „Pokaż zamknięte” | Element wraca na zwykłą listę |
+| TC-23.8 | Ponowne otwarcie okna z tym samym magazynem | Zamknięty element pozostaje ukryty |
+
 ## Założenia i otwarte punkty
 
 - Założenie: Python 3.12 i Windows 10/11 na komputerach developerów.
@@ -409,6 +426,7 @@ Testy TC-22.4–22.6 wymagają prawdziwego tenanta i nie uruchamiają się w zwy
 - Założenie: jest tenant lub folder testowy w Orchestratorze do testów ręcznych z kroku 22.
 - Założenie: eksport CSV raportu to jeden plik ZIP z 5 plikami CSV (po jednym na sekcję).
 - Założenie: wyciszenie powiadomień nie przetrwa restartu aplikacji.
+- Założenie: zamknięcie błędu jest lokalne dla użytkownika, nie współdzielone między developerami.
 - Założenie: retencja danych w Orchestratorze obejmuje co najmniej miesiąc (raporty miesięczne).
 - Nazwy endpointów i pól (np. `ProcessingExceptionType`, `ReportingTime`) warto potwierdzić na Swaggerze Waszego tenanta (`/orchestrator_/swagger`) przed krokiem 06; fixture w testach powinny być zrzutami prawdziwych odpowiedzi.
 
