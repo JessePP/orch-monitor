@@ -36,13 +36,13 @@ Testy: pytest, pytest-qt, pytest-cov, respx, freezegun. Jakość: ruff (lint + f
 - Każde zadanie dopisuje krótką notkę do `CHANGELOG.md`.
 
 ## Status
-- Wszystkie 23 kroki zaimplementowane. 161 testów automatycznych zielonych (+3 `live` pomijane), pokrycie ~91%.
-- Zostaje: build .exe na Windows w CI (job `build-windows`), ręczna lista kontrolna
+- Wszystkie 23 kroki zaimplementowane. 170 testów automatycznych zielonych (+3 `live` pomijane), pokrycie ~91%.
+- CI (test + build-windows) zielone. Zostaje: ręczna lista kontrolna
   `docs/lista_kontrolna_tenant.md` (TC-22.4–22.6), potwierdzenie nazw pól API na Swaggerze tenanta.
 - Szczegóły zadań: `PLAN.md`.
 
 ## Log decyzji
-- 2026-11-26 — Repo lokalne w `/home/user/orch-monitor`, kopia w `/mnt/project-files/orch-monitor/` — brak repozytorium GitHub.
+- 2026-11-26 — Repo na GitHubie: JessePP/orch-monitor (main); CI buduje też .exe na Windows.
 - 2026-11-26 — Krok 22 (.exe) budowany w CI na runnerze Windows; tutaj tylko spec i smoke na Linuksie — środowisko jest linuksowe.
 - 2026-11-26 — Pusta lista folderów = wszystkie foldery — wygodny start bez konfiguracji.
 - 2026-11-26 — Wczorajsze liczniki kolejek cache'owane per doba — mniej zapytań co 30 s.

@@ -107,13 +107,23 @@ class QueueDetailsDialog(QDialog):
         top.addWidget(self.kind_combo)
         self.show_dismissed_check = QCheckBox("Pokaż zamknięte")
         self.dismiss_button = QPushButton("Zamknij zaznaczone")
+        self.clear_button = QPushButton("Wyczyść widok")
+        self.clear_button.setToolTip(
+            "Ukrywa wszystkie widoczne błędy; potem pojawią się tylko nowe"
+        )
         self.restore_button = QPushButton("Przywróć zaznaczone")
         bottom = QHBoxLayout()
         bottom.addWidget(self.info_label, 1)
         bottom.addWidget(self.show_dismissed_check)
         bottom.addWidget(self.dismiss_button)
+        bottom.addWidget(self.clear_button)
         bottom.addWidget(self.restore_button)
-        for w in (self.show_dismissed_check, self.dismiss_button, self.restore_button):
+        for w in (
+            self.show_dismissed_check,
+            self.dismiss_button,
+            self.clear_button,
+            self.restore_button,
+        ):
             w.setVisible(store is not None)
         self.restore_button.setVisible(False)
         lay = QVBoxLayout(self)
@@ -124,6 +134,7 @@ class QueueDetailsDialog(QDialog):
         self.kind_combo.currentIndexChanged.connect(self.load)
         self.show_dismissed_check.toggled.connect(self._on_show_toggled)
         self.dismiss_button.clicked.connect(self.dismiss_selected)
+        self.clear_button.clicked.connect(self.clear_view)
         self.restore_button.clicked.connect(self.restore_selected)
         self.table.itemSelectionChanged.connect(self._update_buttons)
         self._update_buttons()
@@ -189,6 +200,8 @@ class QueueDetailsDialog(QDialog):
             text = f"Pokazano pierwsze {LIMIT} elementów – lista obcięta."
         else:
             text = f"Elementów: {len(self._shown)}"
+        if hidden and not self._shown:
+            text = "Widok wyczyszczony – nowe błędy pojawią się tutaj"
         if hidden:
             label = "zamkniętych" if show_all else "zamkniętych ukrytych"
             text += f" · {label}: {hidden}"
@@ -205,6 +218,7 @@ class QueueDetailsDialog(QDialog):
         selected = self._selected_items()
         closed = [it for it in selected if self._is_dismissed(it.item_id)]
         self.dismiss_button.setEnabled(len(selected) > len(closed))
+        self.clear_button.setEnabled(any(not self._is_dismissed(it.item_id) for it in self._shown))
         self.restore_button.setVisible(self.show_dismissed_check.isChecked())
         self.restore_button.setEnabled(bool(closed))
 
@@ -215,6 +229,15 @@ class QueueDetailsDialog(QDialog):
         if self._store is None:
             return
         ids = [it.item_id for it in self._selected_items() if not self._is_dismissed(it.item_id)]
+        if ids:
+            self._store.dismiss(ids, self._clock())
+            self._render()
+
+    def clear_view(self) -> None:
+        """Zamyka wszystkie widoczne (niezamkniete) elementy naraz."""
+        if self._store is None:
+            return
+        ids = [it.item_id for it in self._shown if not self._is_dismissed(it.item_id)]
         if ids:
             self._store.dismiss(ids, self._clock())
             self._render()

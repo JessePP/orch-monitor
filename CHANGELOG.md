@@ -43,3 +43,6 @@
 - `config/dismissed.py`: `DismissedStore` (`dismissed.json` obok ustawień, zapis atomowy, uszkodzony plik = pusty zbiór, czyszczenie wpisów starszych niż 60 dni).
 - Okno szczegółów kolejki: „Zamknij zaznaczone”, „Pokaż zamknięte” (wyszarzone, „(zamknięty)”), „Przywróć zaznaczone”; lista z cache ostatniego wyniku, bez ponownych zapytań do API.
 - Liczniki AE/BE i powiadomienia bez zmian (statystyka z Orchestratora); zamknięcie jest lokalne dla użytkownika.
+
+### Szczegóły kolejki: „Wyczyść widok”
+- Przycisk „Wyczyść widok” chowa jednym kliknięciem wszystkie widoczne błędy; potem pokazują się tylko nowe (TC-23.9).

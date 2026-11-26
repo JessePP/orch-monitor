@@ -418,6 +418,7 @@ Testy TC-22.4–22.6 wymagają prawdziwego tenanta i nie uruchamiają się w zwy
 | TC-23.6 | „Pokaż zamknięte” | Zamknięty element widoczny, szary, z dopiskiem „(zamknięty)” |
 | TC-23.7 | „Przywróć zaznaczone” przy włączonym „Pokaż zamknięte” | Element wraca na zwykłą listę |
 | TC-23.8 | Ponowne otwarcie okna z tym samym magazynem | Zamknięty element pozostaje ukryty |
+| TC-23.9 | „Wyczyść widok”, potem odświeżenie z nowym błędem | Lista pusta z komunikatem „Widok wyczyszczony…”, po odświeżeniu widoczny tylko nowy błąd |
 
 ## Założenia i otwarte punkty
 

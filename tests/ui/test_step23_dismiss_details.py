@@ -93,3 +93,23 @@ def test_TC_23_8_stays_hidden_after_reopen(qtbot: QtBot, tmp_path: Path) -> None
     assert _refs(d2) == ["REF-2", "REF-3"]
     d3 = _dlg(qtbot, Provider(), _store(tmp_path))  # nowy store z tego samego pliku
     assert _refs(d3) == ["REF-2", "REF-3"]
+
+
+def test_TC_23_9_clear_view_then_only_new_errors(qtbot: QtBot, tmp_path: Path) -> None:
+    prov, store = Provider(), _store(tmp_path)
+    d = _dlg(qtbot, prov, store)
+    assert d.clear_button.isEnabled()
+    d.clear_button.click()
+    assert _refs(d) == []
+    assert not d.clear_button.isEnabled()
+    assert d.info_label.text().startswith("Widok wyczyszczony")
+    assert all(store.is_dismissed(i) for i in (1, 2, 3)) and prov.calls == 1
+
+    class WithNew(Provider):
+        def __call__(self, row: QueueRow, kind: Kind) -> DetailsResult:
+            old = super().__call__(row, kind).items
+            new = QueueItemDetail(4, "REF-4", "AE", "Nowy", to_local(NOW), "BOT01")
+            return DetailsResult([new, *old])
+
+    d2 = _dlg(qtbot, WithNew(), store)
+    assert _refs(d2) == ["REF-4"]
