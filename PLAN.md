@@ -18,8 +18,8 @@ plus pokrycie >= 85% dla `api`, `services`, `notify`, `reports`, wpis w `CHANGEL
 |---|---|---|---|---|---|
 | T1 | Fundamenty: szkielet, ustawienia, OAuth, klient OData, foldery | 01–05 | sonnet | – | ✅ |
 | T2 | Warstwa danych: roboty, joby, kolejki, szczegóły, harmonogram | 06–10 | sonnet | T1 | ✅ |
-| T3 | Interfejs: okno, zasobnik, 3 zakładki, ustawienia, CSV | 11–15 | sonnet | T2 | ☐ |
-| T4 | Silnik powiadomień, raporty (agregacja + eksport), logi | 16, 18, 19, 21 | sonnet | T2 | ☐ |
+| T3 | Interfejs: okno, zasobnik, 3 zakładki, ustawienia, CSV | 11–15 | sonnet | T2 | ✅ |
+| T4 | Silnik powiadomień, raporty (agregacja + eksport), logi | 16, 18, 19, 21 | sonnet | T2 | ✅ |
 | T5 | UI powiadomień i raportu, menu logów, pakowanie .exe | 17, 20, 21 (menu), 22 | sonnet | T3, T4 | ☐ |
 | T6 | Dokumentacja: CLAUDE.md, README, CHANGELOG | – | haiku | T5 | ☐ |
 | T7 | Weryfikacja końcowa (pełne testy, diff, zgodność z planem) | – | opus | T6 | ☐ |
