@@ -36,13 +36,24 @@ Testy: pytest, pytest-qt, pytest-cov, respx, freezegun. Jakość: ruff (lint + f
 - Każde zadanie dopisuje krótką notkę do `CHANGELOG.md`.
 
 ## Status
-Patrz `PLAN.md`.
+- Wszystkie 22 kroki zaimplementowane. 161 testów automatycznych zielonych (+3 `live` pomijane), pokrycie ~91%.
+- Zostaje: build .exe na Windows w CI (job `build-windows`), ręczna lista kontrolna
+  `docs/lista_kontrolna_tenant.md` (TC-22.4–22.6), potwierdzenie nazw pól API na Swaggerze tenanta.
+- Szczegóły zadań: `PLAN.md`.
 
 ## Log decyzji
 - 2026-11-26 — Repo lokalne w `/home/user/orch-monitor`, kopia w `/mnt/project-files/orch-monitor/` — brak repozytorium GitHub.
 - 2026-11-26 — Krok 22 (.exe) budowany w CI na runnerze Windows; tutaj tylko spec i smoke na Linuksie — środowisko jest linuksowe.
+- 2026-11-26 — Pusta lista folderów = wszystkie foldery — wygodny start bez konfiguracji.
+- 2026-11-26 — Wczorajsze liczniki kolejek cache'owane per doba — mniej zapytań co 30 s.
+- 2026-11-26 — Eksport CSV raportu jako ZIP z 5 plikami — założenie z planu.
+- 2026-11-26 — Wyciszenie powiadomień tylko w pamięci — założenie z planu.
+- 2026-11-26 — Helpery testów UI w `tests/ui/helpers.py` zamiast `conftest.py` — conftest w `tests/ui` przesłaniał importy testów unit.
 
 ## Znane pułapki
 - PySide6 na Linuksie wymaga libEGL/libGL; testy UI z `QT_QPA_PLATFORM=offscreen`. Tray niedostępny
   offscreen (`QSystemTrayIcon.isSystemTrayAvailable() == False`) – testy mockują tray.
 - Zmiana czasu (marzec/październik): granice doby liczyć w Europe/Warsaw, potem konwertować na UTC.
+- Aplikacja windowed (PyInstaller, `console=False`) nie ma stdout: `--version` i `--self-test` sprawdzać kodem wyjścia, nie tekstem.
+- Ikona `packaging/orch_monitor.ico` ma tylko 32×32 px.
+- Nazwy pól OData (`ProcessingExceptionType`, `ReportingTime`) przyjęte z dokumentacji — potwierdzić na Swaggerze tenanta.

@@ -21,8 +21,8 @@ plus pokrycie >= 85% dla `api`, `services`, `notify`, `reports`, wpis w `CHANGEL
 | T3 | Interfejs: okno, zasobnik, 3 zakładki, ustawienia, CSV | 11–15 | sonnet | T2 | ✅ |
 | T4 | Silnik powiadomień, raporty (agregacja + eksport), logi | 16, 18, 19, 21 | sonnet | T2 | ✅ |
 | T5 | UI powiadomień i raportu, menu logów, pakowanie .exe | 17, 20, 21 (menu), 22 | sonnet | T3, T4 | ✅ |
-| T6 | Dokumentacja: CLAUDE.md, README, CHANGELOG | – | haiku | T5 | ☐ |
-| T7 | Weryfikacja końcowa (pełne testy, diff, zgodność z planem) | – | opus | T6 | ☐ |
+| T6 | Dokumentacja: CLAUDE.md, README, CHANGELOG | – | haiku | T5 | ✅ |
+| T7 | Weryfikacja końcowa (pełne testy, diff, zgodność z planem) | – | opus | T6 | ✅ |
 
 T3 i T4 idą równolegle: T3 rusza tylko `ui/`, T4 tylko `notify/`, `reports/`, `logging_setup.py`.
 `reports/csv_export.py` tworzy T4 (krok 19 wymaga go szerzej); T3 dla eksportu zakładki 3
@@ -36,3 +36,4 @@ TC-22.4–22.6 to lista ręczna / marker `live`.
 
 ## Log eskalacji
 (brak)
+Wszystkie zadania T1–T5 zrobione przez sonnet za pierwszym podejściem; T7 (Opus) dodał poprawki opisane w CHANGELOG, sekcja Weryfikacja końcowa.
