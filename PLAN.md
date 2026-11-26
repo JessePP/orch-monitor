@@ -16,7 +16,7 @@ plus pokrycie >= 85% dla `api`, `services`, `notify`, `reports`, wpis w `CHANGEL
 
 | ID | Tytuł | Kroki | Model | Zależy od | Status |
 |---|---|---|---|---|---|
-| T1 | Fundamenty: szkielet, ustawienia, OAuth, klient OData, foldery | 01–05 | sonnet | – | ☐ |
+| T1 | Fundamenty: szkielet, ustawienia, OAuth, klient OData, foldery | 01–05 | sonnet | – | ✅ |
 | T2 | Warstwa danych: roboty, joby, kolejki, szczegóły, harmonogram | 06–10 | sonnet | T1 | ☐ |
 | T3 | Interfejs: okno, zasobnik, 3 zakładki, ustawienia, CSV | 11–15 | sonnet | T2 | ☐ |
 | T4 | Silnik powiadomień, raporty (agregacja + eksport), logi | 16, 18, 19, 21 | sonnet | T2 | ☐ |
