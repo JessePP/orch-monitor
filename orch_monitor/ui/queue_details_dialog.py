@@ -99,7 +99,7 @@ class QueueDetailsDialog(QDialog):
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.table.setColumnWidth(0, 160)
-        self.table.setColumnWidth(1, 50)
+        self.table.setColumnWidth(1, 110)
         self.table.setColumnWidth(2, 380)
         self.table.verticalHeader().setVisible(False)
         top = QHBoxLayout()

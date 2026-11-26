@@ -137,5 +137,6 @@ docs/              specyfikacja, plan budowy, lista kontrolna tenanta
 ![Raport tygodniowy – podsumowanie](docs/img/5_raport_tydzien.png)
 ![Raport tygodniowy – dni](docs/img/6_raport_dni.png)
 ![Ustawienia](docs/img/7_ustawienia.png)
+![Zamknięte błędy w szczegółach kolejki](docs/img/8_zamkniete_bledy.png)
 
 *Zrzuty ekranu z danymi testowymi.*
