@@ -2,7 +2,7 @@
 
 Wykonaj na Windows 10/11, na tenancie testowym Orchestratora (Automation Cloud). Aplikacja pracuje tylko
 w trybie odczytu; konto aplikacji (External Application) potrzebuje uprawnień do odczytu zasobów
-Orchestratora (OR.Execution.Read, OR.Jobs.Read, OR.Monitoring.Read, OR.Queues.Read, OR.Folders.Read, OR.Machines.Read).
+Orchestratora (OR.Robots.Read, OR.Jobs.Read, OR.Queues.Read, OR.Folders.Read, OR.Execution.Read — te same co w `api/auth.py`).
 
 ## Przygotowanie
 1. Pobierz `OrchMonitor.exe` z artefaktu pipeline'u (job `build-windows`) i skopiuj na komputer bez Pythona.
