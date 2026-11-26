@@ -1,0 +1,26 @@
+{
+ "@odata.context": "https://cloud.uipath.com/acme/DefaultTenant/orchestrator_/odata/$metadata#Jobs",
+ "value": [
+  {
+   "Id": 1,
+   "Key": "00000000-0000-4000-8000-000000000001",
+   "Name": "Job1",
+   "State": "Running",
+   "StartTime": "2026-11-26T08:00:00Z"
+  },
+  {
+   "Id": 2,
+   "Key": "00000000-0000-4000-8000-000000000002",
+   "Name": "Job2",
+   "State": "Running",
+   "StartTime": "2026-11-26T08:00:00Z"
+  },
+  {
+   "Id": 3,
+   "Key": "00000000-0000-4000-8000-000000000003",
+   "Name": "Job3",
+   "State": "Running",
+   "StartTime": "2026-11-26T08:00:00Z"
+  }
+ ]
+}

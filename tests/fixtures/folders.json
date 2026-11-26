@@ -1,0 +1,9 @@
+{
+  "@odata.context": "https://cloud.uipath.com/acme/DefaultTenant/orchestrator_/odata/$metadata#Folders",
+  "@odata.count": 3,
+  "value": [
+    {"Key": "11111111-aaaa-4aaa-8aaa-111111111111", "DisplayName": "Finance", "FullyQualifiedName": "Finance", "FullyQualifiedNameOrderable": "Finance", "Description": "Finanse", "ProvisionType": "Manual", "PermissionModel": "FineGrained", "ParentId": null, "IsActive": true, "Id": 101},
+    {"Key": "22222222-bbbb-4bbb-8bbb-222222222222", "DisplayName": "Invoices", "FullyQualifiedName": "Finance/Invoices", "FullyQualifiedNameOrderable": "Finance/Invoices", "Description": null, "ProvisionType": "Manual", "PermissionModel": "FineGrained", "ParentId": 101, "IsActive": true, "Id": 102},
+    {"Key": "33333333-cccc-4ccc-8ccc-333333333333", "DisplayName": "HR", "FullyQualifiedName": "HR", "FullyQualifiedNameOrderable": "HR", "Description": null, "ProvisionType": "Manual", "PermissionModel": "FineGrained", "ParentId": null, "IsActive": true, "Id": 103}
+  ]
+}

@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orch-monitor"
+version = "0.1.0"
+description = "Desktopowy monitor UiPath Orchestrator (tylko odczyt)"
+requires-python = ">=3.12"
+dependencies = [
+    "PySide6",
+    "httpx",
+    "keyring",
+    "pydantic>=2",
+    "openpyxl",
+    "tzdata",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-qt",
+    "pytest-cov",
+    "respx",
+    "freezegun",
+    "ruff",
+    "mypy",
+    "pyinstaller",
+]
+
+[tool.setuptools.packages.find]
+include = ["orch_monitor*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+files = ["orch_monitor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["live: testy na prawdziwym tenancie (domyslnie pomijane)"]
+addopts = "-m 'not live'"
