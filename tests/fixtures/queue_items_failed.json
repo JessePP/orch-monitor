@@ -1,0 +1,70 @@
+{
+ "value": [
+  {
+   "Id": 901,
+   "Reference": "REF-1",
+   "Status": "Failed",
+   "ProcessingExceptionType": "ApplicationException",
+   "ProcessingException": {
+    "Reason": "Powod 1",
+    "Type": "ApplicationException"
+   },
+   "EndProcessing": "2026-11-26T09:59:00Z",
+   "Robot": {
+    "Name": "Beta_bot"
+   }
+  },
+  {
+   "Id": 902,
+   "Reference": "REF-2",
+   "Status": "Failed",
+   "ProcessingExceptionType": "ApplicationException",
+   "ProcessingException": {
+    "Reason": "Powod 2",
+    "Type": "ApplicationException"
+   },
+   "EndProcessing": "2026-11-26T09:58:00Z",
+   "Robot": {
+    "Name": "Beta_bot"
+   }
+  },
+  {
+   "Id": 903,
+   "Reference": "REF-3",
+   "Status": "Failed",
+   "ProcessingExceptionType": "ApplicationException",
+   "ProcessingException": {
+    "Reason": "Powod 3",
+    "Type": "ApplicationException"
+   },
+   "EndProcessing": "2026-11-26T09:57:00Z",
+   "Robot": {
+    "Name": "Beta_bot"
+   }
+  },
+  {
+   "Id": 904,
+   "Reference": "REF-4",
+   "Status": "Failed",
+   "ProcessingExceptionType": "BusinessException",
+   "ProcessingException": {
+    "Reason": "Powod 4",
+    "Type": "BusinessException"
+   },
+   "EndProcessing": "2026-11-26T09:56:00Z",
+   "Robot": {
+    "Name": "Beta_bot"
+   }
+  },
+  {
+   "Id": 905,
+   "Reference": "REF-5",
+   "Status": "Failed",
+   "ProcessingExceptionType": "BusinessException",
+   "EndProcessing": "2026-11-26T09:55:00Z",
+   "Robot": {
+    "Name": "Beta_bot"
+   }
+  }
+ ]
+}

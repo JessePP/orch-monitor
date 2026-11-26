@@ -1,0 +1,9 @@
+{
+  "@odata.context": "https://cloud.uipath.com/acme/DefaultTenant/orchestrator_/odata/$metadata#Sessions",
+  "value": [
+    {"SessionId": 1, "State": "Available", "HostMachineName": "VM-ALPHA", "ReportingTime": "2026-11-26T09:59:30.123Z", "Robot": {"Id": 11, "Name": "zeta_bot", "Type": "Unattended"}},
+    {"SessionId": 2, "State": "Busy", "HostMachineName": "VM-BRAVO", "ReportingTime": "2026-11-26T09:59:45.5Z", "Robot": {"Id": 12, "Name": "Beta_bot", "Type": "Unattended"}},
+    {"SessionId": 3, "State": "Disconnected", "HostMachineName": "VM-CHARLIE", "ReportingTime": "2026-11-26T08:00:00Z", "Robot": {"Id": 13, "Name": "gamma_bot", "Type": "Attended"}},
+    {"SessionId": 4, "State": "Unresponsive", "HostMachineName": "VM-DELTA", "ReportingTime": "2026-11-26T09:30:00.0000000Z", "Robot": {"Id": 14, "Name": "alpha_bot", "Type": "Unattended"}}
+  ]
+}

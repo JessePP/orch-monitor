@@ -1,0 +1,7 @@
+{
+  "value": [
+    {"Id": 501, "State": "Running", "ReleaseName": "Faktury_IN", "HostMachineName": "VM-ALPHA", "StartTime": "2026-11-26T08:59:00Z", "CreationTime": "2026-11-26T08:58:00Z", "Source": "Schedule", "Robot": {"Id": 11, "Name": "zeta_bot"}},
+    {"Id": 502, "State": "Running", "ReleaseName": "Raport_dzienny", "HostMachineName": "VM-BRAVO", "StartTime": "2026-11-26T09:15:00.4567891Z", "CreationTime": "2026-11-26T09:14:00Z", "Source": "Manual", "Robot": {"Id": 12, "Name": "Beta_bot"}},
+    {"Id": 503, "State": "Running", "ReleaseName": "Sync_HR", "HostMachineName": "VM-ECHO", "StartTime": "2026-11-26T08:00:00Z", "CreationTime": "2026-11-26T07:59:00Z", "Source": "Queue", "Robot": {"Id": 15, "Name": "echo_bot"}}
+  ]
+}

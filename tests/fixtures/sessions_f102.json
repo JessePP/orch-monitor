@@ -1,0 +1,6 @@
+{
+  "value": [
+    {"SessionId": 5, "State": "Available", "HostMachineName": "VM-BRAVO", "ReportingTime": "2026-11-26T09:50:00Z", "Robot": {"Id": 12, "Name": "Beta_bot", "Type": "Unattended"}},
+    {"SessionId": 6, "State": "Available", "HostMachineName": "VM-ECHO", "ReportingTime": "2026-11-26T09:59:00Z", "Robot": {"Id": 15, "Name": "echo_bot", "Type": "Unattended"}}
+  ]
+}
