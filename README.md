@@ -128,8 +128,12 @@ docs/              specyfikacja, plan budowy, lista kontrolna tenanta
 
 ## Zrzuty ekranu
 
-![Zakładka Roboty](docs/img/roboty.png)
-![Zakładka Działające](docs/img/dzialajace.png)
-![Zakładka Kolejki](docs/img/kolejki.png)
+![Zakładka Roboty](docs/img/1_roboty.png)
+![Zakładka Działające](docs/img/2_dzialajace.png)
+![Zakładka Kolejki](docs/img/3_kolejki.png)
+![Szczegóły kolejki (AE/BE)](docs/img/4_szczegoly_kolejki.png)
+![Raport tygodniowy – podsumowanie](docs/img/5_raport_tydzien.png)
+![Raport tygodniowy – dni](docs/img/6_raport_dni.png)
+![Ustawienia](docs/img/7_ustawienia.png)
 
 *Zrzuty ekranu z danymi testowymi.*

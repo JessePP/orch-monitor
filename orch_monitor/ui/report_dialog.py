@@ -161,6 +161,8 @@ class ReportDialog(QDialog):
         for title in SECTION_TABS.values():
             table = QTableWidget()
             table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+            table.verticalHeader().setVisible(False)
+            table.horizontalHeader().setStretchLastSection(True)
             self.tables[title] = table
             self.preview.addTab(table, title)
         self.save_csv_button = QPushButton("Zapisz CSV")
