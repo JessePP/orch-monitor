@@ -116,9 +116,15 @@ class Backend:
     ) -> Snapshot:
         if fetcher is None:
             available = list_folders(client)
-            folders, _warnings = resolve_folders(settings.folders, available)
+            if settings.folders:
+                folders, missing = resolve_folders(settings.folders, available)
+            else:  # brak wyboru w ustawieniach = wszystkie foldery
+                folders, missing = list(available), []
+            warnings = {"foldery": "; ".join(missing)} if missing else {}
             minutes = settings.long_job_threshold_min
-            fetcher = DataFetcher(client, folders, self._clock, lambda: timedelta(minutes=minutes))
+            fetcher = DataFetcher(
+                client, folders, self._clock, lambda: timedelta(minutes=minutes), warnings
+            )
             with self._lock:
                 if self._client is client:
                     self._fetcher, self._folders = fetcher, folders
@@ -175,6 +181,8 @@ class App:
         self.bridge.snapshot_ready.connect(self.window.apply_snapshot)
         self.scheduler = RefreshScheduler(self.backend.fetch, settings.refresh_interval_s, clock)
         self.scheduler.subscribe(self.bridge.publish)
+        self.scheduler.subscribe_error(self.bridge.publish_error)
+        self.bridge.error_ready.connect(self.window.show_error)
         self.tray = TrayIcon(
             self.window.show_and_raise, self.open_settings, self.quit, parent=self.window
         )
@@ -194,7 +202,7 @@ class App:
         names = self.backend.folder_names() or list(self.settings.folders)
         dlg = ReportDialog(
             self.backend.build_report,
-            self.settings.folders,
+            list(self.settings.folders) or names,
             names,
             self.clock,
             parent=self.window,

@@ -40,12 +40,15 @@ class DataFetcher:
         folders: list[Folder],
         clock: Clock,
         threshold: Callable[[], timedelta] = lambda: timedelta(minutes=120),
+        warnings: dict[str, str] | None = None,
     ) -> None:
         self._client = client
         self._folders = folders
         self._clock = clock
         self._threshold = threshold
         self._last_faulted_check: datetime | None = None
+        self._warnings = dict(warnings or {})
+        self._yesterday_cache: queues_svc.YesterdayCache = {}
 
     def fetch(self) -> Snapshot:
         started = to_local(self._clock())
@@ -53,14 +56,15 @@ class DataFetcher:
         robots = fetch_robots(c, f)
         run, run_err = jobs_svc.running(c, f, self._clock, self._threshold())
         pend, pend_err = jobs_svc.pending(c, f, self._clock)
-        queues, q_err = queues_svc.today_queues(c, f, self._clock)
+        queues, q_err = queues_svc.today_queues(c, f, self._clock, self._yesterday_cache)
         faulted: list[FaultedJob] = []
         f_err: dict[str, str] = {}
         if self._last_faulted_check is not None:
             faulted, f_err = jobs_svc.faulted_since(c, f, self._last_faulted_check)
         if not f_err:
             self._last_faulted_check = started
-        errors = {
+        errors = {**self._warnings}
+        errors |= {
             name: _join(e)
             for name, e in (
                 ("robots", robots.errors),

@@ -28,6 +28,7 @@ class RefreshScheduler:
         self._wait: Wait = wait if wait is not None else self._event.wait
         self._lock = threading.Lock()
         self._subs: list[Callable[[Snapshot], None]] = []
+        self._err_subs: list[Callable[[str], None]] = []
         self._thread: threading.Thread | None = None
         self.last_good: Snapshot | None = None
         self.last_error: str | None = None
@@ -42,6 +43,17 @@ class RefreshScheduler:
 
     def subscribe(self, cb: Callable[[Snapshot], None]) -> None:
         self._subs.append(cb)
+
+    def subscribe_error(self, cb: Callable[[str], None]) -> None:
+        """Blad pobrania, gdy nie ma jeszcze zadnego dobrego snapshotu (np. zle dane logowania)."""
+        self._err_subs.append(cb)
+
+    def _publish_error(self, message: str) -> None:
+        for cb in list(self._err_subs):
+            try:
+                cb(message)
+            except Exception:  # noqa: BLE001 - blad subskrybenta nie moze zabic watku
+                continue
 
     def _publish(self, snap: Snapshot) -> None:
         for cb in list(self._subs):
@@ -60,6 +72,7 @@ class RefreshScheduler:
             except Exception as exc:  # noqa: BLE001
                 self.last_error = str(exc) or type(exc).__name__
                 if self.last_good is None:
+                    self._publish_error(self.last_error)
                     return None
                 snap = dataclasses.replace(
                     self.last_good,

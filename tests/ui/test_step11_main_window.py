@@ -88,3 +88,19 @@ def test_bridge_delivers_snapshot(qtbot: QtBot) -> None:
     snap = make_snapshot()
     b.publish(snap)
     assert got == [snap]
+
+
+def test_TC_11_6_partial_errors_and_error_without_data(qtbot: QtBot) -> None:
+    import dataclasses
+
+    from orch_monitor.ui.main_window import PARTIAL_TEXT
+
+    w = _win(qtbot)
+    w.show_error("Błędne dane logowania")
+    assert not w.warning_label.isHidden()
+    assert "Błędne dane logowania" in w.warning_label.text()
+    w.apply_snapshot(dataclasses.replace(make_snapshot(), errors={"robots": "Finance: 500"}))
+    assert w.warning_label.text() == PARTIAL_TEXT
+    assert "Finance: 500" in w.warning_label.toolTip()
+    w.apply_snapshot(make_snapshot())
+    assert w.warning_label.isHidden()

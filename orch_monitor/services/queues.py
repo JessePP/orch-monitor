@@ -10,6 +10,8 @@ from orch_monitor.api.folders import Folder
 from orch_monitor.clock import Clock, day_window, to_local
 from orch_monitor.services._common import iso_z, parse_dt
 
+YesterdayCache = dict[tuple[int, int, datetime], tuple[int, int, int]]
+
 
 @dataclass(frozen=True)
 class QueueRow:
@@ -75,10 +77,17 @@ def _row(
     folder: Folder,
     today: tuple[datetime, datetime],
     yesterday: tuple[datetime, datetime],
+    cache: YesterdayCache | None = None,
 ) -> QueueRow:
     qid = int(str(queue["Id"]))
     s, ae, be = day_counts(client, qid, folder.id, *today)
-    ys, yae, ybe = day_counts(client, qid, folder.id, *yesterday)
+    key = (folder.id, qid, yesterday[0])
+    if cache is not None and key in cache:
+        ys, yae, ybe = cache[key]
+    else:
+        ys, yae, ybe = day_counts(client, qid, folder.id, *yesterday)
+        if cache is not None:
+            cache[key] = (ys, yae, ybe)
     pct = success_pct(s, ae, be)
     base = f"QueueDefinitionId eq {qid} and Status eq "
     in_progress = client.count("QueueItems", base + "'InProgress'", folder.id)
@@ -110,17 +119,25 @@ def _row(
 
 
 def today_queues(
-    client: OrchestratorClient, folders: list[Folder], clock: Clock
+    client: OrchestratorClient,
+    folders: list[Folder],
+    clock: Clock,
+    cache: YesterdayCache | None = None,
 ) -> tuple[list[QueueRow], dict[str, str]]:
+    """Wiersz na kazda kolejke. `cache` trzyma wczorajsze liczniki (zamkniete doby sie
+    nie zmieniaja), zeby nie odpytywac o nie API co 30 s."""
     today_date = to_local(clock()).date()
     today = day_window(today_date)
     yesterday = day_window(today_date - timedelta(days=1))
+    if cache is not None:
+        for stale_key in [k for k in cache if k[2] != yesterday[0]]:
+            del cache[stale_key]
     rows: list[QueueRow] = []
     errors: dict[str, str] = {}
     for folder in folders:
         try:
             queues = client.get_all("QueueDefinitions", folder_id=folder.id)
-            rows.extend(_row(client, q, folder, today, yesterday) for q in queues)
+            rows.extend(_row(client, q, folder, today, yesterday, cache) for q in queues)
         except ApiError as exc:
             errors[folder.name] = str(exc)
     rows.sort(key=lambda r: (r.folder.casefold(), r.name.casefold()))

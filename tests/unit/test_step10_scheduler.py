@@ -172,3 +172,14 @@ def test_TC_10_7_fetcher_errors_per_source(api: Any) -> None:
     mock.get(BASE + "QueueDefinitions").respond(200, json={"value": []})
     snapshot = DataFetcher(client, [F1], lambda: NOW).fetch()
     assert set(snapshot.errors) == {"robots"} and "Finance" in snapshot.errors["robots"]
+
+
+def test_TC_10_8_error_without_snapshot_is_published() -> None:
+    def boom() -> Snapshot:
+        raise RuntimeError("401 bledne dane")
+
+    s = RefreshScheduler(boom, 30, lambda: utc("2026-11-26T12:00:00Z"))
+    seen: list[str] = []
+    s.subscribe_error(seen.append)
+    assert s.run_once() is None
+    assert seen == ["401 bledne dane"]

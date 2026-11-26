@@ -149,3 +149,15 @@ def test_TC_08_8_folder_error(api: Any) -> None:
     mock.get(BASE + "QueueDefinitions").respond(500)
     rows, errors = today_queues(client, [F1], lambda: utc("2026-11-26T09:00:00Z"))
     assert rows == [] and set(errors) == {"Finance"}
+
+
+def test_TC_08_9_yesterday_counts_cached(api: Any) -> None:
+    client, mock = api
+    clock = setup(mock, build_items())
+    cache: dict[Any, Any] = {}
+    today_queues(client, [F1], clock, cache)
+    first = [f for f in FILTERS if "ge 2026-11-24T23:00:00Z" in f]
+    FILTERS.clear()
+    rows, _ = today_queues(client, [F1], clock, cache)
+    assert first and not [f for f in FILTERS if "ge 2026-11-24T23:00:00Z" in f]
+    assert next(r for r in rows if r.queue_id == 31).change_pp == 5.0

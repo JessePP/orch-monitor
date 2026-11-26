@@ -32,3 +32,9 @@
 - `ui/report_dialog.py`: okno raportu (Dzień/Tydzień/Miesiąc/Zakres, foldery, generowanie w tle z postępem i anulowaniem, podgląd 5 sekcji, zapis CSV ZIP i Excel); „Raporty…” w trayu i w oknie głównym.
 - `app.py`: wpięcie notifiera, raportów, „Otwórz folder logów”, `setup_logging`, logowanie wywołań API i błędów autoryzacji.
 - Pakowanie: flaga `--self-test`, `--version` odporne na brak stdout, `packaging/OrchMonitor.spec` (onefile, bez konsoli), `entry.py`, ikona, job `build-windows` w CI, `docs/lista_kontrolna_tenant.md` (TC-22.4–22.6).
+
+### Weryfikacja końcowa (Opus)
+- Wczorajsze liczniki kolejek trzymane w pamięci (cache per doba) zamiast odpytywania API co 30 s.
+- Pusta lista folderów w ustawieniach = monitorowanie wszystkich folderów; brakujące foldery widoczne jako ostrzeżenie.
+- Pasek stanu pokazuje częściowe błędy (podpowiedź ze szczegółami) i błąd pobrania przed pierwszymi danymi (np. złe dane logowania).
+- Okno raportu domyślnie zaznacza monitorowane foldery, gdy ustawienia ich nie wskazują.

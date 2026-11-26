@@ -14,6 +14,7 @@ from orch_monitor.ui.tab_robots import RobotsTab
 
 TAB_NAMES = ("Roboty", "Działające", "Kolejki")
 STALE_TEXT = "Brak połączenia z Orchestratorem – pokazuję ostatnie dane"
+PARTIAL_TEXT = "Część danych niedostępna (szczegóły w podpowiedzi)"
 
 
 class MainWindow(QMainWindow):
@@ -53,7 +54,23 @@ class MainWindow(QMainWindow):
         self.queues_tab.apply_snapshot(snapshot)
         stamp = to_local(snapshot.fetched_at).strftime("%H:%M:%S")
         self.updated_label.setText(f"Ostatnia aktualizacja: {stamp}")
-        self.warning_label.setVisible(snapshot.stale)
+        if snapshot.stale:
+            self._set_warning(STALE_TEXT, snapshot.errors)
+        elif snapshot.errors:
+            self._set_warning(PARTIAL_TEXT, snapshot.errors)
+        else:
+            self.warning_label.setVisible(False)
+
+    def show_error(self, message: str) -> None:
+        """Blad pobrania, zanim przyszly jakiekolwiek dane (np. bledne dane logowania)."""
+        self.warning_label.setText(f"Brak danych z Orchestratora: {message}")
+        self.warning_label.setToolTip(message)
+        self.warning_label.setVisible(True)
+
+    def _set_warning(self, text: str, errors: dict[str, str]) -> None:
+        self.warning_label.setText(text)
+        self.warning_label.setToolTip("\n".join(f"{k}: {v}" for k, v in errors.items()))
+        self.warning_label.setVisible(True)
 
     def show_tab(self, name: str) -> None:
         if name not in TAB_NAMES:

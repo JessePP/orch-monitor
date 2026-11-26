@@ -11,6 +11,10 @@ class SnapshotBridge(QObject):
     """Callback wolany z dowolnego watku emituje sygnal dostarczany w watku GUI (queued)."""
 
     snapshot_ready = Signal(object)
+    error_ready = Signal(str)
 
     def publish(self, snapshot: Snapshot) -> None:
         self.snapshot_ready.emit(snapshot)
+
+    def publish_error(self, message: str) -> None:
+        self.error_ready.emit(message)
