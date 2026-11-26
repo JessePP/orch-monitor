@@ -8,20 +8,34 @@ from collections.abc import Sequence
 from datetime import timedelta
 
 import httpx
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QApplication
 
-from orch_monitor.api.auth import TokenProvider
+from orch_monitor.api.auth import AuthError, TokenProvider
 from orch_monitor.api.client import OrchestratorClient
 from orch_monitor.api.folders import Folder, list_folders, resolve_folders
 from orch_monitor.clock import Clock, utc_now
 from orch_monitor.config.secret import get_secret
 from orch_monitor.config.settings import Settings, SettingsError, load_settings
+from orch_monitor.logging_setup import (
+    default_log_dir,
+    log_auth_error,
+    make_api_logger,
+    setup_logging,
+)
+from orch_monitor.notify.engine import NotificationEngine
 from orch_monitor.refresh.scheduler import RefreshScheduler
 from orch_monitor.refresh.snapshot import DataFetcher, Snapshot
+from orch_monitor.reports.builder import Cancelled, Progress, build_report
+from orch_monitor.reports.model import Report
+from orch_monitor.reports.periods import Period
 from orch_monitor.services.queue_details import DetailsResult, Kind, fetch_queue_details
 from orch_monitor.services.queues import QueueRow
 from orch_monitor.ui.bridge import SnapshotBridge
 from orch_monitor.ui.main_window import MainWindow
+from orch_monitor.ui.notifier import Notifier
+from orch_monitor.ui.report_dialog import ReportDialog
 from orch_monitor.ui.settings_dialog import SettingsDialog
 from orch_monitor.ui.tray import TrayIcon
 
@@ -74,7 +88,11 @@ class Backend:
                 )
                 self._http = http
                 self._client = OrchestratorClient(
-                    settings.organization, settings.tenant, tokens, http
+                    settings.organization,
+                    settings.tenant,
+                    tokens,
+                    http,
+                    on_request=make_api_logger(),
                 )
             else:
                 self._http = None
@@ -87,6 +105,15 @@ class Backend:
             client, fetcher, settings = self._client, self._fetcher, self.settings
         if client is None:
             raise RuntimeError("Brak konfiguracji połączenia z Orchestratorem")
+        try:
+            return self._fetch(client, fetcher, settings)
+        except AuthError as exc:
+            log_auth_error(exc)
+            raise
+
+    def _fetch(
+        self, client: OrchestratorClient, fetcher: DataFetcher | None, settings: Settings
+    ) -> Snapshot:
         if fetcher is None:
             available = list_folders(client)
             folders, _warnings = resolve_folders(settings.folders, available)
@@ -105,6 +132,25 @@ class Backend:
             raise RuntimeError("Brak połączenia lub folder nie jest monitorowany")
         return fetch_queue_details(client, row.queue_id, folder.id, self._clock, kind)
 
+    def folder_names(self) -> list[str]:
+        with self._lock:
+            return [f.name for f in self._folders]
+
+    def build_report(
+        self, period: Period, names: list[str], progress: Progress, cancelled: Cancelled
+    ) -> Report:
+        """Raport dla biezacego klienta; foldery rozwiazywane po nazwach z okna raportu."""
+        with self._lock:
+            client = self._client
+        if client is None:
+            raise RuntimeError("Brak konfiguracji połączenia z Orchestratorem")
+        try:
+            folders, _warnings = resolve_folders(names, list_folders(client))
+            return build_report(client, period, folders, progress, cancelled)
+        except AuthError as exc:
+            log_auth_error(exc)
+            raise
+
     def close(self) -> None:
         if self._http is not None:
             self._http.close()
@@ -113,9 +159,10 @@ class Backend:
 class App:
     """Sklada calosc. Punkty rozszerzen dla kolejnych krokow:
 
-    - powiadomienia (krok 17): podlacz `self.bridge.snapshot_ready.connect(...)`, a do tray
-      dodaj wyciszenie przez `self.tray.add_menu_section(...)` i `self.tray.show_message(...)`;
-    - okno raportu (krok 20) i „Otworz folder logow” (krok 21): `self.tray.add_menu_action(...)`.
+    - powiadomienia (krok 17): `Notifier` podpiety do `bridge.snapshot_ready`, ustawienia
+      powiadomien czytane na biezaco z `self.settings` (zmiana po zapisie obowiazuje od razu);
+    - okno raportu (krok 20): pozycja „Raporty…” w trayu i przycisk w oknie glownym;
+    - „Otworz folder logow” (krok 21): pozycja w trayu.
     """
 
     def __init__(self, qapp: QApplication, settings: Settings, clock: Clock = utc_now) -> None:
@@ -132,6 +179,28 @@ class App:
             self.window.show_and_raise, self.open_settings, self.quit, parent=self.window
         )
         self.settings_dialog: SettingsDialog | None = None
+        self.report_dialog: ReportDialog | None = None
+        self.engine = NotificationEngine(lambda: self.settings.notifications, clock)
+        self.notifier = Notifier(self.tray, self.window, self.engine, clock)
+        self.bridge.snapshot_ready.connect(self.notifier.on_snapshot)
+        self.tray.add_menu_action("Raporty…", self.open_reports)
+        self.tray.add_menu_action("Otwórz folder logów", self.open_logs)
+        self.window.reports_button.clicked.connect(lambda _c=False: self.open_reports())
+
+    def open_logs(self) -> None:
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(default_log_dir())))
+
+    def open_reports(self) -> None:
+        names = self.backend.folder_names() or list(self.settings.folders)
+        dlg = ReportDialog(
+            self.backend.build_report,
+            self.settings.folders,
+            names,
+            self.clock,
+            parent=self.window,
+        )
+        self.report_dialog = dlg
+        dlg.open()
 
     def start(self) -> None:
         self.tray.show()
@@ -168,6 +237,7 @@ def run_app(argv: Sequence[str] | None = None) -> int:
     qapp = QApplication.instance() or QApplication(list(argv if argv is not None else sys.argv))
     assert isinstance(qapp, QApplication)
     qapp.setQuitOnLastWindowClosed(False)
+    setup_logging()
     try:
         settings = load_settings()
     except SettingsError:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtGui import QCloseEvent
-from PySide6.QtWidgets import QLabel, QMainWindow, QTabWidget, QWidget
+from PySide6.QtWidgets import QLabel, QMainWindow, QPushButton, QTabWidget, QWidget
 
 from orch_monitor.clock import Clock, to_local, utc_now
 from orch_monitor.refresh.snapshot import Snapshot
@@ -41,7 +41,9 @@ class MainWindow(QMainWindow):
         self.warning_label = QLabel(STALE_TEXT)
         self.warning_label.setStyleSheet("color: #b71c1c; font-weight: bold;")
         self.warning_label.setVisible(False)
+        self.reports_button = QPushButton("Raporty…")
         bar = self.statusBar()
+        bar.addPermanentWidget(self.reports_button)
         bar.addWidget(self.updated_label)
         bar.addPermanentWidget(self.warning_label)
 

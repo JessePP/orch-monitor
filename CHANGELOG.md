@@ -26,3 +26,9 @@
 - `notify/engine.py`: wykrywanie nowych AE/BE, rozłączonych robotów i nowych Faulted, grupowanie, wyciszenie.
 - `reports/`: okresy dzień/tydzień/miesiąc/zakres, `build_report`, eksport ZIP z 5 CSV i Excel (5 arkuszy).
 - `logging_setup.py`: log do pliku z rotacją 5 × 1 MB, maskowanie tokenów i sekretów.
+
+### T5: powiadomienia UI, okno raportu, menu logów, pakowanie (kroki 17, 20-22)
+- `ui/notifier.py`: komunikaty w zasobniku z `NotificationEngine`, kliknięcie otwiera właściwą zakładkę, podmenu „Wycisz powiadomienia” (30 min / 1 h / 4 h / do końca dnia / Włącz), zmiana ikony przy wyciszeniu (tylko w pamięci).
+- `ui/report_dialog.py`: okno raportu (Dzień/Tydzień/Miesiąc/Zakres, foldery, generowanie w tle z postępem i anulowaniem, podgląd 5 sekcji, zapis CSV ZIP i Excel); „Raporty…” w trayu i w oknie głównym.
+- `app.py`: wpięcie notifiera, raportów, „Otwórz folder logów”, `setup_logging`, logowanie wywołań API i błędów autoryzacji.
+- Pakowanie: flaga `--self-test`, `--version` odporne na brak stdout, `packaging/OrchMonitor.spec` (onefile, bez konsoli), `entry.py`, ikona, job `build-windows` w CI, `docs/lista_kontrolna_tenant.md` (TC-22.4–22.6).

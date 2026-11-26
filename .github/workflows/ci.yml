@@ -17,3 +17,25 @@ jobs:
       - run: pytest -q --cov=orch_monitor --cov-report=term-missing
         env:
           QT_QPA_PLATFORM: offscreen
+
+  build-windows:
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install .[dev]
+      - run: pyinstaller packaging/OrchMonitor.spec --noconfirm
+      - name: Smoke test (--version, --self-test)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist/OrchMonitor.exe -ArgumentList "--version" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "--version zakonczone kodem $($p.ExitCode)" }
+          $p = Start-Process -FilePath dist/OrchMonitor.exe -ArgumentList "--self-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "--self-test zakonczone kodem $($p.ExitCode)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OrchMonitor-exe
+          path: dist/OrchMonitor.exe
