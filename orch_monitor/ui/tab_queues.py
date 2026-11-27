@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 )
 
 from orch_monitor.config.dismissed import DismissedStore
+from orch_monitor.config.notes import NotesStore
 from orch_monitor.refresh.snapshot import Snapshot
 from orch_monitor.reports.csv_queues import (
     default_filename,
@@ -68,9 +69,11 @@ class QueuesTab(QWidget):
         parent: QWidget | None = None,
         synchronous_details: bool = False,
         store: DismissedStore | None = None,
+        notes: NotesStore | None = None,
     ) -> None:
         super().__init__(parent)
         self._store = store
+        self._notes = notes
         self._provider = details_provider
         self._sync = synchronous_details
         self._rows: list[QueueRow] = []
@@ -129,6 +132,7 @@ class QueuesTab(QWidget):
             parent=self,
             synchronous=self._sync,
             store=self._store,
+            notes=self._notes,
         )
         dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         dlg.finished.connect(

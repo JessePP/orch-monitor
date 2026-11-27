@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal
+from PySide6.QtCore import QModelIndex, QObject, QRunnable, Qt, QThreadPool, Signal
 from PySide6.QtGui import QBrush, QColor
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -23,11 +23,14 @@ from PySide6.QtWidgets import (
 
 from orch_monitor.clock import Clock, to_local, utc_now
 from orch_monitor.config.dismissed import DismissedStore
+from orch_monitor.config.notes import ErrorRef, NotesError, NotesStore
 from orch_monitor.services.queue_details import DetailsResult, Kind, QueueItemDetail
 from orch_monitor.services.queues import QueueRow
+from orch_monitor.ui.notes_dialog import NotesDialog, note_count_text
 
 DetailsProvider = Callable[[QueueRow, Kind], DetailsResult]
-COLUMNS = ["Referencja", "Typ", "Treść błędu", "Godzina", "Robot"]
+COLUMNS = ["Referencja", "Typ", "Treść błędu", "Godzina", "Robot", "Notatki"]
+NOTES_COL = 5
 LIMIT = 500
 GREY = QColor("#8a8a8a")
 
@@ -72,10 +75,14 @@ class QueueDetailsDialog(QDialog):
         synchronous: bool = False,
         store: DismissedStore | None = None,
         clock: Clock = utc_now,
+        notes: NotesStore | None = None,
     ) -> None:
         super().__init__(parent)
         self.queue = queue
         self._store = store
+        self._notes = notes
+        self._note_counts: dict[str, int] = {}
+        self.notes_dialog: NotesDialog | None = None
         self._clock = clock
         self._result: DetailsResult | None = None
         self._shown: list[QueueItemDetail] = []
@@ -95,7 +102,11 @@ class QueueDetailsDialog(QDialog):
         self.table.setHorizontalHeaderLabels(COLUMNS)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setStretchLastSection(notes is None)
+        if notes is not None:
+            self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        self.table.setColumnHidden(NOTES_COL, notes is None)
+        self.table.setColumnWidth(NOTES_COL, 70)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.table.setColumnWidth(0, 160)
@@ -112,8 +123,12 @@ class QueueDetailsDialog(QDialog):
             "Ukrywa wszystkie widoczne błędy; potem pojawią się tylko nowe"
         )
         self.restore_button = QPushButton("Przywróć zaznaczone")
+        self.notes_button = QPushButton("Notatki…")
+        self.notes_button.setToolTip("Notatki do zaznaczonego błędu (także dwuklik na wierszu)")
+        self.notes_button.setVisible(notes is not None)
         bottom = QHBoxLayout()
         bottom.addWidget(self.info_label, 1)
+        bottom.addWidget(self.notes_button)
         bottom.addWidget(self.show_dismissed_check)
         bottom.addWidget(self.dismiss_button)
         bottom.addWidget(self.clear_button)
@@ -137,6 +152,8 @@ class QueueDetailsDialog(QDialog):
         self.clear_button.clicked.connect(self.clear_view)
         self.restore_button.clicked.connect(self.restore_selected)
         self.table.itemSelectionChanged.connect(self._update_buttons)
+        self.notes_button.clicked.connect(self._open_selected_notes)
+        self.table.doubleClicked.connect(self._on_double_click)
         self._update_buttons()
         self.load()
 
@@ -186,12 +203,14 @@ class QueueDetailsDialog(QDialog):
         show_all = self.show_dismissed_check.isChecked()
         hidden = sum(1 for it in result.items if self._is_dismissed(it.item_id))
         self._shown = [it for it in result.items if show_all or not self._is_dismissed(it.item_id)]
+        self._load_note_counts()
         self.table.setRowCount(len(self._shown))
         for row, it in enumerate(self._shown):
             closed = self._is_dismissed(it.item_id)
             when = to_local(it.end_processing).strftime("%H:%M:%S") if it.end_processing else "–"
             kind = f"{it.exception_type} (zamknięty)" if closed else it.exception_type
-            for col, text in enumerate([it.reference, kind, it.reason, when, it.robot]):
+            notes = note_count_text(self._note_counts.get(self._ref(it).key, 0))
+            for col, text in enumerate([it.reference, kind, it.reason, when, it.robot, notes]):
                 cell = QTableWidgetItem(text)
                 if closed:
                     cell.setForeground(QBrush(GREY))
@@ -208,11 +227,48 @@ class QueueDetailsDialog(QDialog):
         self.info_label.setText(text)
         self._update_buttons()
 
+    def _load_note_counts(self) -> None:
+        self._note_counts = {}
+        if self._notes is None:
+            return
+        try:
+            self._note_counts = self._notes.counts()
+        except NotesError as exc:
+            self.status_label.setText(str(exc))
+
+    def _ref(self, it: QueueItemDetail) -> ErrorRef:
+        return ErrorRef(
+            "queue_item",
+            it.item_id,
+            f"Kolejka {self.queue.name} ({self.queue.folder}) · {it.reference or it.item_id}",
+            f"{it.exception_type}: {it.reason}" if it.reason else it.exception_type,
+        )
+
+    def open_notes(self, row: int) -> NotesDialog | None:
+        """Okno notatek dla wiersza; po zmianie notatek odswieza kolumne Notatki."""
+        if self._notes is None or not 0 <= row < len(self._shown):
+            return None
+        dlg = NotesDialog(self._ref(self._shown[row]), self._notes, parent=self)
+        dlg.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+        dlg.changed.connect(self._render)
+        self.notes_dialog = dlg
+        dlg.show()
+        return dlg
+
+    def _on_double_click(self, index: QModelIndex) -> None:
+        self.open_notes(index.row())
+
+    def _open_selected_notes(self) -> None:
+        selected = self._selected_items()
+        if len(selected) == 1:
+            self.open_notes(self._shown.index(selected[0]))
+
     def _selected_items(self) -> list[QueueItemDetail]:
         rows = {i.row() for i in self.table.selectionModel().selectedRows()}
         return [self._shown[r] for r in sorted(rows) if 0 <= r < len(self._shown)]
 
     def _update_buttons(self) -> None:
+        self.notes_button.setEnabled(len(self._selected_items()) == 1)
         if self._store is None:
             return
         selected = self._selected_items()

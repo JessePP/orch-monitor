@@ -12,6 +12,12 @@ i generuje raporty. Aplikacja niczego nie uruchamia, nie zatrzymuje i nie zmieni
   i eksport do CSV. W szczegółach można „zamknąć” obsłużone elementy AE/BE albo jednym kliknięciem „Wyczyścić widok” (potem widać tylko nowe błędy), pokazać je
   ponownie („Pokaż zamknięte”) lub przywrócić. Zamknięcie jest tylko lokalne (plik `dismissed.json` obok ustawień,
   wpisy starsze niż 60 dni są usuwane) i nie zmienia liczników AE/BE ani powiadomień.
+- **Notatki do błędów, wspólne dla zespołu**: dwuklik na błędzie AE/BE w szczegółach kolejki albo na jobie
+  w sekcji „Dziś zakończone błędem (Faulted)” otwiera okno notatek. Widać kto i kiedy napisał każdą notatkę,
+  można dopisać swoją i usunąć własną; kolumna „Notatki” pokazuje ich liczbę. Notatki leżą we wspólnym folderze
+  sieciowym (Ustawienia > „Folder notatek zespołu”, np. `\\serwer\zespol\OrchMonitor`), każda w osobnym pliku,
+  więc kilka osób może pisać jednocześnie. Pusty folder w ustawieniach = notatki tylko na tym komputerze.
+  Autorem jest login Windows. Notatki nie trafiają do Orchestratora.
 - **Powiadomienia** na pulpit: robot przestał odpowiadać, nowe AE/BE w kolejce, job Faulted. Można je wyciszyć
   na 30 min, 1 h, 4 h lub do końca dnia (zasobnik > „Wycisz powiadomienia”). Wyciszenie działa tylko w bieżącej
   sesji aplikacji.
@@ -53,6 +59,11 @@ Aplikację zakłada administrator organizacji w **Admin > External Applications*
 | Ustawienia (TOML, bez sekretu) | `%APPDATA%\OrchMonitor\settings.toml` | `~/.config/orch-monitor/settings.toml` |
 | Client Secret | Windows Credential Manager, usługa `OrchMonitor` | keyring systemu |
 | Logi (rotacja 5 × 1 MB) | `%LOCALAPPDATA%\OrchMonitor\logs\orch_monitor.log` | `~/.local/state/orch-monitor/logs/orch_monitor.log` |
+
+| Notatki do błędów | folder z ustawień (wspólny) lub `%APPDATA%\OrchMonitor\notes` | `~/.config/orch-monitor/notes` |
+
+Notatki w folderze: `<folder>\<tenant>\qi-<Id elementu kolejki>` lub `job-<Id joba>`, jeden plik JSON na notatkę.
+Każdy w zespole potrzebuje prawa zapisu do wspólnego folderu.
 
 Tokeny i sekret są maskowane w logach. Szybki dostęp do logów: zasobnik > „Otwórz folder logów”.
 
@@ -139,5 +150,8 @@ docs/              specyfikacja, plan budowy, lista kontrolna tenanta
 ![Ustawienia](docs/img/7_ustawienia.png)
 ![Zamknięte błędy w szczegółach kolejki](docs/img/8_zamkniete_bledy.png)
 ![Wyczyszczony widok szczegółów](docs/img/9_wyczyszczony_widok.png)
+![Kolumna Notatki w szczegółach kolejki](docs/img/10_notatki_kolumna.png)
+![Okno notatek do błędu](docs/img/11_okno_notatek.png)
+![Dzisiejsze joby Faulted z notatkami](docs/img/12_faulted_dzis.png)
 
 *Zrzuty ekranu z danymi testowymi.*

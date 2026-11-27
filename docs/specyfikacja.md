@@ -81,6 +81,13 @@ Zapytanie: `GET /odata/Jobs?$filter=State eq 'Running'&$expand=Robot`.
 - Licznik: ile jobów działa teraz i ile czeka.
 - Wyróżnienie jobu, który działa dłużej niż 2 godziny (próg zmieniany w ustawieniach).
 - Osobna sekcja **Oczekujące (Pending)**: joby czekające na wolnego robota, z procesem, czasem dodania i czasem oczekiwania. Zapytanie: `GET /odata/Jobs?$filter=State eq 'Pending'`.
+- Osobna sekcja **Dziś zakończone błędem (Faulted)**: proces, robot, godzina końca, informacja o błędzie, folder i liczba notatek. Lista pobierana raz od północy, potem dopisywana z tego samego zapytania co powiadomienia (bez dodatkowych zapytań co 30 s).
+
+**Notatki do błędów (wspólne dla zespołu)**
+
+- Dwuklik na jobie Faulted (zakładka 2) albo na elemencie AE/BE w szczegółach kolejki (zakładka 3) otwiera okno notatek: lista notatek (autor = login Windows, data, tekst), dopisanie nowej, usunięcie własnej, „Odśwież”.
+- Notatki leżą we wspólnym folderze sieciowym zespołu (ustawienie „Folder notatek zespołu”), w podfolderze tenanta i błędu; każda notatka to osobny plik JSON, więc jednoczesne pisanie nie nadpisuje cudzych notatek. Pusty folder = notatki lokalne.
+- Notatki nie są zapisywane w Orchestratorze; aplikacja dalej tylko czyta z Orchestratora.
 
 ## 5. Zakładka 3: Dzisiejsze kolejki
 
@@ -223,4 +230,5 @@ Wszystkie pytania mają odpowiedź.
 - Aplikacja na pulpit, Windows, Python z PySide6.
 - Powiadomienia: tak, w tym joby Faulted; z czasowym wyciszeniem.
 - Raporty za dzień, tydzień lub miesiąc.
+- Notatki do błędów: wspólny folder sieciowy zespołu (wybrane 2026-11-27 zamiast Storage Bucket w Orchestratorze, listy SharePoint czy własnego serwera), bez nowych uprawnień w Orchestratorze.
 

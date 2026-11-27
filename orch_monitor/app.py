@@ -6,6 +6,7 @@ import sys
 import threading
 from collections.abc import Sequence
 from datetime import timedelta
+from pathlib import Path
 
 import httpx
 from PySide6.QtCore import QUrl
@@ -17,6 +18,7 @@ from orch_monitor.api.client import OrchestratorClient
 from orch_monitor.api.folders import Folder, list_folders, resolve_folders
 from orch_monitor.clock import Clock, utc_now
 from orch_monitor.config.dismissed import DismissedStore
+from orch_monitor.config.notes import NotesStore
 from orch_monitor.config.secret import get_secret
 from orch_monitor.config.settings import Settings, SettingsError, load_settings
 from orch_monitor.logging_setup import (
@@ -50,6 +52,15 @@ def test_connection(org: str, tenant: str, client_id: str, secret: str) -> list[
     with httpx.Client(timeout=20.0) as http:
         client = OrchestratorClient(org, tenant, TokenProvider(org, client_id, secret, http), http)
         return list_folders(client)
+
+
+def notes_store_for(settings: Settings, store: NotesStore | None = None) -> NotesStore:
+    """Magazyn notatek wg ustawien: wspolny folder albo lokalny (pusty `notes_folder`)."""
+    base = Path(settings.notes_folder) if settings.notes_folder.strip() else None
+    if store is None:
+        return NotesStore(base, settings.tenant)
+    store.configure(base, settings.tenant)
+    return store
 
 
 def _safe_secret(client_id: str) -> str | None:
@@ -124,7 +135,12 @@ class Backend:
             warnings = {"foldery": "; ".join(missing)} if missing else {}
             minutes = settings.long_job_threshold_min
             fetcher = DataFetcher(
-                client, folders, self._clock, lambda: timedelta(minutes=minutes), warnings
+                client,
+                folders,
+                self._clock,
+                lambda: timedelta(minutes=minutes),
+                warnings,
+                track_faulted_today=True,
             )
             with self._lock:
                 if self._client is client:
@@ -178,7 +194,10 @@ class App:
         self.settings = settings
         self.backend = Backend(settings, clock)
         self.dismissed = DismissedStore(clock=clock)
-        self.window = MainWindow(clock, details_provider=self.backend.details, store=self.dismissed)
+        self.notes = notes_store_for(settings)
+        self.window = MainWindow(
+            clock, details_provider=self.backend.details, store=self.dismissed, notes=self.notes
+        )
         self.bridge = SnapshotBridge()
         self.bridge.snapshot_ready.connect(self.window.apply_snapshot)
         self.scheduler = RefreshScheduler(self.backend.fetch, settings.refresh_interval_s, clock)
@@ -231,6 +250,7 @@ class App:
 
     def on_settings_saved(self, settings: Settings) -> None:
         self.settings = settings
+        notes_store_for(settings, self.notes)
         self.backend.configure(settings)
         self.scheduler.set_interval(settings.refresh_interval_s)
         self.scheduler.refresh_now()

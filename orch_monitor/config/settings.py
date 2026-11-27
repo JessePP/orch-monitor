@@ -30,6 +30,7 @@ class Settings(BaseModel):
     folders: list[str] = Field(default_factory=list)
     refresh_interval_s: int = Field(default=30, gt=0)
     long_job_threshold_min: int = Field(default=120, gt=0)
+    notes_folder: str = ""  # wspolny folder notatek (np. \\serwer\zespol); pusty = lokalnie
     notifications: NotificationSettings = Field(default_factory=NotificationSettings)
 
 
