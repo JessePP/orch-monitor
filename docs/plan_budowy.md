@@ -420,6 +420,27 @@ Testy TC-22.4–22.6 wymagają prawdziwego tenanta i nie uruchamiają się w zwy
 | TC-23.8 | Ponowne otwarcie okna z tym samym magazynem | Zamknięty element pozostaje ukryty |
 | TC-23.9 | „Wyczyść widok”, potem odświeżenie z nowym błędem | Lista pusta z komunikatem „Widok wyczyszczony…”, po odświeżeniu widoczny tylko nowy błąd |
 
+### 24. Wspólne notatki do błędów
+
+- **Cel:** developer klika błąd (element AE/BE w szczegółach kolejki albo dzisiejszy job Faulted) i zapisuje notatkę; cały zespół widzi te same notatki.
+- **Zakres:** `config/notes.py` (`NotesStore`, `ErrorRef`, `Note`; folder `<folder>/<tenant>/<qi-Id|job-Id>/`, jeden plik JSON na notatkę, zapis atomowy, autor = login Windows); ustawienie `notes_folder` w oknie ustawień (pusty = folder lokalny obok ustawień); `ui/notes_dialog.py`; kolumna „Notatki” i przycisk „Notatki…” w szczegółach kolejki; sekcja „Dziś zakończone błędem (Faulted)” w zakładce 2 (`Snapshot.faulted_today`, `DataFetcher(track_faulted_today=True)`); wpięcie `App` → `MainWindow` → zakładki.
+- **Kryteria akceptacji:** dwie osoby piszące jednocześnie nie nadpisują sobie notatek; cudzej notatki nie da się usunąć; brak dostępu do folderu daje komunikat po polsku zamiast awarii, a wpisany tekst nie ginie; notatki z różnych tenantów się nie mieszają; w Orchestratorze nic się nie zmienia; sekcja Faulted nie dodaje zapytań co 30 s.
+
+| ID | Scenariusz | Oczekiwany wynik |
+|---|---|---|
+| TC-24.1 | Dodanie notatki i odczyt z nowego magazynu | Ta sama notatka (autor, czas, tekst), plik w folderze błędu; pusta notatka odrzucona |
+| TC-24.2 | Dwóch autorów, ta sama sekunda, ten sam błąd | Obie notatki zapisane i widoczne dla obu |
+| TC-24.3 | Usuwanie notatek | Własna usunięta; cudza → `NotesError`, plik zostaje |
+| TC-24.4 | Brak folderu, uszkodzone pliki, folder niedostępny | Pusta lista / złe pliki pominięte / komunikat „Nie udało się … notatek” |
+| TC-24.5 | Liczniki i tenanty; zmiana folderu w ustawieniach | `counts()` per błąd; inny tenant nie widzi notatek; `configure` przełącza folder |
+| TC-24.6 | `DataFetcher(track_faulted_today=True)` | 1. pobranie od północy bez powiadomień, potem dopisywanie nowych, po północy lista pusta |
+| TC-24.7 | Okno notatek: dodanie | Notatka na liście „autor · data”, pole wyczyszczone, sygnał `changed`; pusty tekst = przycisk nieaktywny |
+| TC-24.8 | Okno notatek: cudza i własna, „Odśwież” | Usuwanie aktywne tylko dla własnej; „Odśwież” pokazuje notatki dopisane przez innych |
+| TC-24.9 | Szczegóły kolejki | Kolumna „Notatki” z liczbą, „Notatki…”/dwuklik otwiera okno, licznik aktualizuje się po dodaniu; bez magazynu kolumna ukryta |
+| TC-24.10 | Zakładka 2: dzisiejsze Faulted | Sekcja widoczna, licznik „· N Faulted dziś”, kolumna „Notatki”, dwuklik otwiera notatki joba |
+| TC-24.11 | Ustawienia: folder notatek | Zapis `notes_folder` (przycięty), pusty = lokalnie |
+| TC-24.12 | Folder lokalny / niedostępny w oknie notatek | Podpowiedź o folderze wspólnym / komunikat błędu, tekst zostaje w polu |
+
 ## Założenia i otwarte punkty
 
 - Założenie: Python 3.12 i Windows 10/11 na komputerach developerów.
@@ -428,6 +449,7 @@ Testy TC-22.4–22.6 wymagają prawdziwego tenanta i nie uruchamiają się w zwy
 - Założenie: eksport CSV raportu to jeden plik ZIP z 5 plikami CSV (po jednym na sekcję).
 - Założenie: wyciszenie powiadomień nie przetrwa restartu aplikacji.
 - Założenie: zamknięcie błędu jest lokalne dla użytkownika, nie współdzielone między developerami.
+- Założenie: zespół ma wspólny folder sieciowy z prawem zapisu dla wszystkich; notatki nie wygasają.
 - Założenie: retencja danych w Orchestratorze obejmuje co najmniej miesiąc (raporty miesięczne).
 - Nazwy endpointów i pól (np. `ProcessingExceptionType`, `ReportingTime`) warto potwierdzić na Swaggerze Waszego tenanta (`/orchestrator_/swagger`) przed krokiem 06; fixture w testach powinny być zrzutami prawdziwych odpowiedzi.
 

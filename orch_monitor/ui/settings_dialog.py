@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,
+    QFileDialog,
     QFormLayout,
     QHBoxLayout,
     QLabel,
@@ -120,6 +121,12 @@ class SettingsDialog(QDialog):
         self.cb_queue_be.setChecked(n.queue_be)
         self.cb_job_faulted = QCheckBox("Job zakończony błędem (Faulted)")
         self.cb_job_faulted.setChecked(n.job_faulted)
+        self.notes_edit = QLineEdit(settings.notes_folder)
+        self.notes_edit.setPlaceholderText(r"np. \\serwer\zespol\OrchMonitor; pusty = lokalnie")
+        self.notes_edit.setToolTip(
+            "Wspólny folder sieciowy, w którym cały zespół trzyma notatki do błędów"
+        )
+        self.notes_browse = QPushButton("Wybierz…")
         self.save_status = QLabel("")
         self.save_status.setWordWrap(True)
 
@@ -132,6 +139,10 @@ class SettingsDialog(QDialog):
         form.addRow("", self.interval_error)
         form.addRow("Próg długiego joba", self.threshold_spin)
         form.addRow("", self.threshold_error)
+        notes_row = QHBoxLayout()
+        notes_row.addWidget(self.notes_edit, 1)
+        notes_row.addWidget(self.notes_browse)
+        form.addRow("Folder notatek zespołu", notes_row)
         test_row = QHBoxLayout()
         test_row.addWidget(self.test_button)
         test_row.addWidget(self.connection_label, 1)
@@ -152,11 +163,19 @@ class SettingsDialog(QDialog):
         lay.addWidget(self.buttons)
 
         self.test_button.clicked.connect(self.test_connection)
+        self.notes_browse.clicked.connect(self._browse_notes)
         self.save_button.clicked.connect(self.save)
         self.cancel_button.clicked.connect(self.reject)
         self.interval_spin.valueChanged.connect(self._validate)
         self.threshold_spin.valueChanged.connect(self._validate)
         self._validate()
+
+    def _browse_notes(self) -> None:
+        path = QFileDialog.getExistingDirectory(
+            self, "Folder notatek zespołu", self.notes_edit.text()
+        )
+        if path:
+            self.notes_edit.setText(path)
 
     # --- foldery ---
     def _add_folder(self, name: str, checked: bool) -> None:
@@ -262,6 +281,7 @@ class SettingsDialog(QDialog):
             folders=self.selected_folders(),
             refresh_interval_s=self.interval_spin.value(),
             long_job_threshold_min=self.threshold_spin.value(),
+            notes_folder=self.notes_edit.text().strip(),
             notifications=NotificationSettings(
                 robot_down=self.cb_robot_down.isChecked(),
                 queue_ae=self.cb_queue_ae.isChecked(),

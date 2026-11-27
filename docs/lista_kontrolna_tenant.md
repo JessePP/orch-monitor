@@ -36,6 +36,14 @@ Orchestratora (OR.Robots.Read, OR.Jobs.Read, OR.Queues.Read, OR.Folders.Read, OR
    (Monitoring / Jobs / Queues). Rozbieżności: ______
 6. „Zapisz CSV”: ZIP z 5 plikami CSV (UTF-8, separator `;`) otwiera się w Excelu poprawnie.
 
+## Notatki do błędów (krok 24)
+1. Ustawienia > „Folder notatek zespołu”: wskaż wspólny folder sieciowy, zapisz.
+2. Szczegóły kolejki z AE: dwuklik na elemencie, dodaj notatkę. W kolumnie „Notatki” pojawia się „📝 1”.
+3. Na drugim komputerze (inny login Windows, ten sam folder): ta sama notatka widoczna, autor = login z pkt 2.
+   Dopisz notatkę, na pierwszym komputerze „Odśwież” w oknie notatek pokazuje obie.
+4. Cudzej notatki nie da się usunąć („Usuń moją notatkę” nieaktywne), własną tak.
+5. Job Faulted z dzisiaj widoczny w zakładce Działające w sekcji „Dziś zakończone błędem (Faulted)”; dwuklik otwiera notatki.
+
 ## Logi
 - Ikona zasobnika > „Otwórz folder logów”: `%LOCALAPPDATA%\OrchMonitor\logs\orch_monitor.log`.
 - Sprawdź, że w logu nie ma tokenu ani client secret.

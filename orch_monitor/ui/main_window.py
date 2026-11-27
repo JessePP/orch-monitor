@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QLabel, QMainWindow, QPushButton, QTabWidget, QWid
 
 from orch_monitor.clock import Clock, to_local, utc_now
 from orch_monitor.config.dismissed import DismissedStore
+from orch_monitor.config.notes import NotesStore
 from orch_monitor.refresh.snapshot import Snapshot
 from orch_monitor.ui.queue_details_dialog import DetailsProvider
 from orch_monitor.ui.tab_jobs import JobsTab
@@ -26,15 +27,16 @@ class MainWindow(QMainWindow):
         synchronous_details: bool = False,
         parent: QWidget | None = None,
         store: DismissedStore | None = None,
+        notes: NotesStore | None = None,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle("Orchestrator Monitor")
         self.resize(1100, 650)
         self.allow_close = False  # True: closeEvent naprawde zamyka okno
         self.robots_tab = RobotsTab()
-        self.jobs_tab = JobsTab(clock)
+        self.jobs_tab = JobsTab(clock, notes=notes)
         self.queues_tab = QueuesTab(
-            details_provider, synchronous_details=synchronous_details, store=store
+            details_provider, synchronous_details=synchronous_details, store=store, notes=notes
         )
         self.tabs = QTabWidget()
         for name, tab in zip(

@@ -46,3 +46,10 @@
 
 ### Szczegóły kolejki: „Wyczyść widok”
 - Przycisk „Wyczyść widok” chowa jednym kliknięciem wszystkie widoczne błędy; potem pokazują się tylko nowe (TC-23.9).
+
+### T9: wspólne notatki do błędów (krok 24)
+- `config/notes.py`: `NotesStore` – notatki we wspólnym folderze (`<folder>/<tenant>/<qi-Id|job-Id>/`), jeden plik JSON na notatkę (brak nadpisywania przy jednoczesnym pisaniu), autor = login Windows, usuwanie tylko własnych, uszkodzone pliki pomijane, błędy dostępu jako czytelny komunikat.
+- `ui/notes_dialog.py`: okno notatek (lista, dopisanie, usunięcie własnej, „Odśwież”, informacja gdzie leżą notatki).
+- Szczegóły kolejki: kolumna „Notatki” z liczbą, dwuklik / „Notatki…” otwiera okno.
+- Zakładka Działające: sekcja „Dziś zakończone błędem (Faulted)” z kolumną „Notatki”; `DataFetcher(track_faulted_today=True)` pobiera dzisiejsze Faulted raz od północy, potem dopisuje z zapytania powiadomień.
+- Ustawienia: „Folder notatek zespołu” (`notes_folder`, pusty = lokalnie).

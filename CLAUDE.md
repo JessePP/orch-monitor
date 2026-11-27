@@ -36,7 +36,7 @@ Testy: pytest, pytest-qt, pytest-cov, respx, freezegun. Jakość: ruff (lint + f
 - Każde zadanie dopisuje krótką notkę do `CHANGELOG.md`.
 
 ## Status
-- Wszystkie 23 kroki zaimplementowane. 170 testów automatycznych zielonych (+3 `live` pomijane), pokrycie ~91%.
+- Wszystkie 24 kroki zaimplementowane. 185 testów automatycznych zielonych (+3 `live` pomijane), pokrycie ~92%.
 - CI (test + build-windows) zielone. Zostaje: ręczna lista kontrolna
   `docs/lista_kontrolna_tenant.md` (TC-22.4–22.6), potwierdzenie nazw pól API na Swaggerze tenanta.
 - Szczegóły zadań: `PLAN.md`.
@@ -50,6 +50,7 @@ Testy: pytest, pytest-qt, pytest-cov, respx, freezegun. Jakość: ruff (lint + f
 - 2026-11-26 — Wyciszenie powiadomień tylko w pamięci — założenie z planu.
 - 2026-11-26 — Helpery testów UI w `tests/ui/helpers.py` zamiast `conftest.py` — conftest w `tests/ui` przesłaniał importy testów unit.
 - 2026-11-26 — Zamknięte błędy trzymane lokalnie w dismissed.json — aplikacja tylko czyta z Orchestratora.
+- 2026-11-27 — Notatki do błędów we wspólnym folderze sieciowym, plik na notatkę — wybór Mateusza; bez uprawnień zapisu w Orchestratorze, bez serwera.
 
 ## Znane pułapki
 - PySide6 na Linuksie wymaga libEGL/libGL; testy UI z `QT_QPA_PLATFORM=offscreen`. Tray niedostępny

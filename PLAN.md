@@ -24,6 +24,7 @@ plus pokrycie >= 85% dla `api`, `services`, `notify`, `reports`, wpis w `CHANGEL
 | T6 | Dokumentacja: CLAUDE.md, README, CHANGELOG | – | haiku | T5 | ✅ |
 | T7 | Weryfikacja końcowa (pełne testy, diff, zgodność z planem) | – | opus | T6 | ✅ |
 | T8 | Zamykanie błędów w szczegółach kolejki (lokalny `dismissed.json`) | 23 | sonnet | T7 | ✅ |
+| T9 | Wspólne notatki do błędów (folder sieciowy), sekcja Faulted w zakładce 2 | 24 | opus | T8 | ✅ |
 
 T3 i T4 idą równolegle: T3 rusza tylko `ui/`, T4 tylko `notify/`, `reports/`, `logging_setup.py`.
 `reports/csv_export.py` tworzy T4 (krok 19 wymaga go szerzej); T3 dla eksportu zakładki 3
